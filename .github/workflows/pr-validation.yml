@@ -1,0 +1,21 @@
+name: Pull Request Template Validation
+on:
+  pull_request:
+    types: [opened, edited, synchronize, labeled, unlabeled]
+
+jobs:
+  pr-template-validation:
+    name: Validates if PR title and body matches template
+    runs-on: ubuntu-latest
+    # Don't run on PRs labeled as exception
+    if: ${{ !contains(github.event.*.labels.*.name, 'skip-pr-template-validation') && github.event.pull_request.user.login != 'x-nowNick' }}
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Validate PR Title & Body
+        uses: nowNick/pr-template-validator@main
+        with:
+          title-contains: "XYZ-"
+          body-regex: 'ABC-\d+'
